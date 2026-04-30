@@ -2,7 +2,8 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-const dbPath = path.join(__dirname, 'data.db');
+const isVercel = process.env.VERCEL === '1';
+const dbPath = isVercel ? '/tmp/data.db' : path.join(__dirname, 'data.db');
 const db = new Database(dbPath);
 
 // Ensure the users table matches SQL1.sql
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS files (
 `);
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, 'uploads');
+const uploadsDir = isVercel ? '/tmp/uploads' : path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir);
 }

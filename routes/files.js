@@ -10,8 +10,9 @@ const router = express.Router();
 
 // Multer storage config
 const storage = multer.diskStorage({
+const isVercel = process.env.VERCEL === '1';
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '..', 'uploads'));
+        cb(null, isVercel ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads'));
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + crypto.randomBytes(6).toString('hex');
@@ -90,7 +91,8 @@ router.get('/:id/download', (req, res) => {
         const file = db.prepare('SELECT * FROM files WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
         if (!file) return res.status(404).json({ error: 'File not found' });
 
-        const filePath = path.join(__dirname, '..', 'uploads', file.stored_name);
+        const isVercel = process.env.VERCEL === '1';
+        const filePath = path.join(isVercel ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads'), file.stored_name);
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({ error: 'File missing on server' });
         }
@@ -107,7 +109,8 @@ router.get('/:id/preview', (req, res) => {
         const file = db.prepare('SELECT * FROM files WHERE id = ? AND user_id = ?').get(req.params.id, req.user.id);
         if (!file) return res.status(404).json({ error: 'File not found' });
 
-        const filePath = path.join(__dirname, '..', 'uploads', file.stored_name);
+        const isVercel = process.env.VERCEL === '1';
+        const filePath = path.join(isVercel ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads'), file.stored_name);
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({ error: 'File missing on server' });
         }
@@ -128,7 +131,8 @@ router.delete('/:id', (req, res) => {
         db.prepare('DELETE FROM files WHERE id = ? AND user_id = ?').run(req.params.id, req.user.id);
 
         // Delete from disk
-        const filePath = path.join(__dirname, '..', 'uploads', file.stored_name);
+        const isVercel = process.env.VERCEL === '1';
+        const filePath = path.join(isVercel ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads'), file.stored_name);
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
