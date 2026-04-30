@@ -26,7 +26,7 @@
 - **Runtime:** [Node.js](https://nodejs.org/)
 - **Framework:** [Express.js](https://expressjs.com/)
 - **Database:** [SQLite](https://www.sqlite.org/index.html) (via `better-sqlite3`)
-- **Authentication:** `jsonwebtoken` & `bcrypt`
+- **Authentication:** `jsonwebtoken` & `bcryptjs`
 - **File Handling:** `multer`
 
 ---
